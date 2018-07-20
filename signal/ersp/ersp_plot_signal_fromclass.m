@@ -60,12 +60,15 @@ addRequired(p, 'epochs', @isstruct);
 
 addParameter(p, 'newfig', 1, @isnumeric);
 addParameter(p, 'baseonly', 1, @isnumeric);
+addParameter(p, 'shadeplot', 0, @isnumeric);
 
 parse(p, class, epochs, varargin{:})
 
 class = p.Results.class;
 epochs = p.Results.epochs;
 newfig = p.Results.newfig;
+baseonly = p.Results.baseonly;
+shadeplot = p.Results.shadeplot;
 
 % getting time stamps
 x = 1:epochs.length/1000*epochs.srate;
@@ -78,7 +81,20 @@ if isfield(epochs, 'prestim')
 if newfig, h = figure('name', 'ERSP signal', 'NumberTitle', 'off', 'ToolBar', 'none'); else h = NaN; end
 hold on;
 
+
+if ~baseonly
+    if shadeplot
+        m = NaN(1,epochs.length/1000*epochs.srate);M = NaN(1,epochs.length/1000*epochs.srate);
+        nsim = 100;
+        for i = 1:nsim * epochs.n
+            tmp = ersp_generate_signal_fromclass(class,epochs,'baseonly',0,'epochNumber',ceil(i/nsim));
+            m = min(m,tmp);
+            M = max(M,tmp);
+        end
+        shadebetween(x,M,m,[.8 .8 .8],'none',.5);
+    end
+end
+
 signal = ersp_generate_signal_fromclass(class, epochs, 'baseonly', 1);
 plot(x, signal, '-');
-
 end
