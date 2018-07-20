@@ -80,7 +80,7 @@ x = x/epochs.srate;
 if isfield(epochs, 'prestim')
     x = x - epochs.prestim/1000; end
 
-if newfig, h = figure('name', 'ERP signal', 'NumberTitle', 'off', 'ToolBar', 'none'); else, h = NaN; end
+if newfig, h = figure('name', 'ERP signal', 'NumberTitle', 'off', 'ToolBar', 'none'); else, h = gcf; end
 hold on;
 
 % plotting the mean signal, no deviations applied
@@ -89,7 +89,8 @@ plot(x, erp_generate_signal_fromclass(class, epochs, 'baseonly', 1), '-');
 if ~baseonly
     % signal with maximum possible deviation (negative)
     ax = gca;
-    ax.ColorOrderIndex = 1;
+        colidx = ax.ColorOrderIndex;
+        ax.ColorOrderIndex = colidx;
     plot(x, erp_generate_signal( ...
             class.peakLatency - class.peakLatencyDv - class.peakLatencyShift, ...
             class.peakWidth - class.peakWidthDv, ...
@@ -97,7 +98,7 @@ if ~baseonly
             epochs.srate, epochs.length), ':');
 
     % signal with maximum possible deviation (positive)
-    ax.ColorOrderIndex = 1;
+        ax.ColorOrderIndex = colidx;
     plot(x, erp_generate_signal( ...
             class.peakLatency + class.peakLatencyDv + class.peakLatencyShift, ...
             class.peakWidth + class.peakWidthDv, ...
